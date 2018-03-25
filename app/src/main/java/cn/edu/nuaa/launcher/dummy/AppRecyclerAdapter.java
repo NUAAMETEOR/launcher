@@ -1,6 +1,7 @@
 package cn.edu.nuaa.launcher.dummy;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import cn.edu.nuaa.launcher.R;
@@ -37,14 +37,27 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
     }
 
     @Override
-    public void onBindViewHolder(AppRecyclerAdapter.AppRecyclerViewHolder holder, int position) {
-        View view = holder.itemView;
-        ResolveInfo info = data.get(position);
-        ImageView iv = view.findViewById(R.id.app_icon);
-        TextView tv = view.findViewById(R.id.app_name);
-        PackageManager pm=context.getPackageManager();
+    public void onBindViewHolder(AppRecyclerAdapter.AppRecyclerViewHolder holder, final int position) {
+        View           view = holder.itemView;
+        ResolveInfo    info = data.get(position);
+        ImageView      iv   = view.findViewById(R.id.app_icon);
+        TextView       tv   = view.findViewById(R.id.app_name);
+        PackageManager pm   = context.getPackageManager();
         tv.setText(info.loadLabel(pm));
         iv.setImageDrawable(info.loadIcon(pm));
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ResolveInfo info = data.get(position);
+                if (info != null) {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setClassName(info.activityInfo.applicationInfo.packageName, info.activityInfo.name);
+                    AppRecyclerAdapter.this.context.startActivity(intent);
+
+                }
+            }
+        });
     }
 
     @Override
@@ -57,5 +70,6 @@ public class AppRecyclerAdapter extends RecyclerView.Adapter<AppRecyclerAdapter.
             super(itemView);
         }
     }
+
 
 }
